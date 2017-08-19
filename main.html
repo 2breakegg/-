@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{padding:0px; margin:0px;}
+        .fl{
+            float:left;
+        }
+        .info{
+            padding:1px;
+            height:530px;
+            width:220px;
+        }
+        .border1{
+            border:10px solid black;
+        }
+        .border2{
+            border:10px solid white;
+        }
+        .skill{
+            font-size: 8px;
+            border:1px solid blue;
+        }
+        .progress_bar{
+            position: relative;
+            border:black 1px solid;
+            text-shadow:#000 1px 0 0,#000 0 1px 0,#000 -1px 0 0,#000 0 -1px 0;
+            color:white;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+<div id="main" class="ccc">
+    <div class="content">
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+    </div>
+</div>
+    <div class="info fl border2" id="left"></div>
+    <canvas class="fl" id="map" width="550" height="550" style="border:1px solid #d3d3d3;"></canvas>
+    <div class="info fl border2" id="right"></div>
+</body>
+</html>
+<script src="./lib/jq.js"></script>
+<script src="./battle.js"></script>
+<script src="./battle_player.js"></script>
+<script src="./battle_player2.js"></script>
+<script>
+
+
+
+
+    window.onload=function(){
+        new_gem_arr(map.map_max_x,map.map_max_y);
+        xiaochu();
+        draw_map();
+        setTimeout('player_now=battle_player;player_now.turn=1; player_now.show()',1000)
+    }
+</script>

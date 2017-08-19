@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id="map" width="1300" height="800" style="border:1px solid #d3d3d3;"></canvas><br>
+<input id='upload' type=file onchange="Preview(this,'pic');setTimeout('change_pic()',100)">
+X:<input id="x" type="number" >
+Y:<input id="y" type="number" ><br>
+<img id="pic" src="http://i1.hdslb.com/bfs/archive/30ee35718145ffd871e51622d47e120f585f4e92.jpg"/>
+
+</body>
+</html>
+<script src="../lib/jq.js"></script>
+<script>
+    var map_canvas=$('#map')[0];
+    var map_ctx=map_canvas.getContext("2d");
+    var pic_selected={
+        have:false,
+        x:0,
+        y:0,
+        get x_m(){return this.x*pic.width},
+        get y_m(){return this.y*pic.height}
+    }
+    var pic={
+        x:5,
+        y:5,
+        get width(){return this.width_all/this.x},
+        get height(){return this.height_all/this.y},
+        width_all:0,
+        height_all:0,
+    }
+    var pic_arr=new Array();
+    $('#x').bind('change',function(){pic.x=this.value;setTimeout('change_pic()',100)});
+    $('#y').bind('change',function(){pic.y=this.value;setTimeout('change_pic()',100)});
+    //打乱一维数组
+    function mix(lenght){
+        var arr=new Array();
+        for(var i=0; i<lenght;i++){
+            arr.push(i);
+        }
+        var arr1=new Array();
+        while(arr.length){
+            var ranX=Math.floor(Math.random()*arr.length);
+            arr1.push(arr[ranX]);
+            arr[ranX]=arr[arr.length-1] ;
+            arr.pop();
+        }
+        return arr1;
+    }
+    function new_pic_arr(){
+        var x=pic.x;
+        var y=pic.y;
+        var arr_1D=mix(x*y);
+        for(var yi=0;yi<y;yi++){
+            pic_arr.push(new Array());
+            for(var xi=0; xi<x ; xi++){
+                var num=arr_1D.pop();
+                pic_arr[yi].push(new Array(num%pic.x,Math.floor(num/pic.x)));
+            }
+        }
+//        for(var yi=0;yi<y;yi++){
+//            pic_arr.push(new Array());
+//            for(var xi=0; xi<x ; xi++){
+//                pic_arr[yi].push(new Array(xi,yi));
+//            }
+//        }
+    }
+
+    function change_pic(){
+        pic_arr=new Array();
+        pic.width_all=$('#pic').width();
+        pic.height_all=$('#pic').height();
+        map_canvas.width=pic.width_all;
+        map_canvas.height=pic.height_all;
+        img=$('#pic')[0];
+        new_pic_arr();
+        draw_map();
+    }
+
+
+    function draw_map() {
+        map_ctx.clearRect(0,0,10000,10000);
+        for (k1 in pic_arr) {
+            for(k2 in pic_arr[k1]) {
+                var x=pic_arr[k1][k2][0];
+                var y=pic_arr[k1][k2][1];
+                var width=pic.width;
+                var height=pic.height;
+//                map_ctx.drawImage(img,1,2);
+                map_ctx.drawImage(img,x*width,y*height,width,height,k2*width,k1*height,width,height);
+/*                map_ctx.fillStyle=gem_color[pic_arr[k1][k2]];
+                map_ctx.fillRect(k2*gem.width,k1*gem.height,gem.width,gem.height);*/
+            }
+        }
+        if(pic_selected.have) {
+            console.log(1);
+            map_ctx.lineWidth = 2;
+            map_ctx.strokeStyle = '#fff';
+            map_ctx.strokeRect(pic_selected.x_m, pic_selected.y_m, pic.width, pic.height);
+        }
+    }
+    
+
+    $('#map').bind("click",function(e){
+        var x_m=e.offsetX;
+        var y_m=e.offsetY;
+        var x=Math.floor(x_m/pic.width);
+        var y=Math.floor(y_m/pic.height);
+        if(x<pic.x && y<pic.y) {
+            if (pic_selected.have) {
+                console.log()
+                var color = pic_arr[y][x];
+                console.log('pic_arr[y][x]='+pic_arr[y][x]+'=========pic_arr[pic_selected.y][pic_selected.x]='+pic_arr[pic_selected.y][pic_selected.x]);
+                pic_arr[y][x]=pic_arr[pic_selected.y][pic_selected.x];
+                pic_arr[pic_selected.y][pic_selected.x]=color;
+                pic_selected.have = false;
+            } else {
+                console.log(x + '===' + y);
+                pic_selected.have = true;
+                pic_selected.x = x;
+                pic_selected.y = y;
+            }
+        }
+        draw_map();
+    })
+
+    //流量文件用
+    function Preview(f,imgSrc) {
+        document.getElementById(imgSrc).src = window.URL.createObjectURL(f.files[0]);
+    }
+
+    window.onload=function(){
+        change_pic();
+    }
+
+</script>
